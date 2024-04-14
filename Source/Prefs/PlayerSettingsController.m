@@ -211,6 +211,7 @@
         @{@"key": @"selectableLyrics"},
         @{@"key": @"volBar"},
         @{@"key": @"disableAutoRadio"},
+        @{@"key": @"sponsorBlock"},
         @{@"key": @"skipWarning"},
     ];
 

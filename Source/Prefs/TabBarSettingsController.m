@@ -59,7 +59,7 @@
     if (indexPath.section == 0 && indexPath.row == 0) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"cell0"];
 
-        UISegmentedControl *startupPage = [[UISegmentedControl alloc] initWithItems:@[[self tbImageNamed:@"yt_outline_home_24pt"], [self tbImageNamed:@"youtube_outline/samples_24pt"], [self tbImageNamed:@"yt_outline_compass_24pt"], [self tbImageNamed:@"yt_outline_library_music_24pt"], [self tbImageNamed:@"icons/downloads"]]];
+        UISegmentedControl *startupPage = [[UISegmentedControl alloc] initWithItems:@[[self tbImageNamed:@"yt_outline_home_24pt"], [self tbImageNamed:@"youtube_outline/samples_24pt"], [self tbImageNamed:@"yt_outline_compass_24pt"], [self tbImageNamed:@"yt_outline_library_music_24pt"], [self tbImageNamed:@"downloads"]]];
 
         for (UIView *segmentView in startupPage.subviews) {
             for (UIView *subview in segmentView.subviews) {
@@ -107,11 +107,23 @@
 }
 
 - (UIImage *)tbImageNamed:(NSString *)imageName {
-    BOOL isDownloads = [imageName isEqualToString:@"icons/downloads"];
+    YTAssetLoader *al = [[NSClassFromString(@"YTAssetLoader") alloc] initWithBundle:[NSBundle mainBundle]];
 
-    YTAssetLoader *al = [[NSClassFromString(@"YTAssetLoader") alloc] initWithBundle:isDownloads ? NSBundle.ytmu_defaultBundle : [NSBundle mainBundle]];
+    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:CGSizeMake(24, 24)];
+    UIImage *downloadsImage = [renderer imageWithActions:^(UIGraphicsImageRendererContext * _Nonnull rendererContext) {
+        UIImage *buttonImage = [UIImage imageWithContentsOfFile:[NSBundle.ytmu_defaultBundle pathForResource:@"downloads" ofType:@"png" inDirectory:@"icons"]];
+        UIView *imageView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 24, 24)];
+        UIImageView *buttonImageView = [[UIImageView alloc] initWithImage:buttonImage];
+        buttonImageView.contentMode = UIViewContentModeScaleAspectFit;
+        buttonImageView.clipsToBounds = YES;
+        buttonImageView.tintColor = [UIColor labelColor];
+        buttonImageView.frame = imageView.bounds;
 
-    return [al imageNamed:imageName];
+        [imageView addSubview:buttonImageView];
+        [imageView.layer renderInContext:rendererContext.CGContext];
+    }];
+
+    return [imageName isEqualToString:@"downloads"] ? downloadsImage : [al imageNamed:imageName];
 }
 
 - (BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath {

@@ -1,11 +1,28 @@
-#import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 #import "Headers/Localization.h"
-#import "Headers/YTMToastController.h"
-#import "Headers/YTPlayerViewController.h"
 
 #define ytmuBool(key) [[[NSUserDefaults standardUserDefaults] dictionaryForKey:@"YTMUltimate"][key] boolValue]
 #define ytmuInt(key) [[[NSUserDefaults standardUserDefaults] dictionaryForKey:@"YTMUltimate"][key] integerValue]
+
+@interface YTPlayerViewController : UIViewController
+@property (nonatomic, strong) NSMutableDictionary *sponsorBlockValues;
+
+- (void)seekToTime:(CGFloat)time;
+- (NSString *)currentVideoID;
+- (CGFloat)currentVideoMediaTime;
+- (void)skipSegment;
+@end
+
+@interface GOOHUDMessageAction : NSObject
+@property (nonatomic, copy, readwrite) NSString *title;
+- (void)setHandler:(void(^)(void))handler;
+@end
+
+@interface YTMToastController : NSObject
+- (void)showMessage:(NSString *)message;
+- (void)showMessage:(NSString *)message HUDMessageAction:(GOOHUDMessageAction *)action infoType:(int)infoType duration:(CGFloat)duration;
+@end
 
 %hook YTPlayerViewController
 %property (nonatomic, strong) NSMutableDictionary *sponsorBlockValues;
@@ -17,7 +34,7 @@
 
     self.sponsorBlockValues = [NSMutableDictionary dictionary];
 
-    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://sponsor.ajay.app/api/skipSegments?videoID=%@&categories=%@", self.currentVideoID, @"%5B%22music_offtopic%22%5D"]]];
+    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://sponsor.ajay.app/api/skipSegments?videoID=%@&categories=%@", self.currentVideoID, @"[%22music_offtopic%22]"]]];
 
     [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if (!error) {
